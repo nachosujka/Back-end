@@ -13,7 +13,11 @@ router.use((req, res, next) => {
 });
 
 router.get("/", (req, res) => {
-  res.json(products);
+  const limit = parseInt(req.query.limit) || 10;
+  const producstWithLimit =
+    products.length <= limit ? products : products.slice(0, limit);
+
+  res.json(producstWithLimit);
 });
 
 router.get("/:pid", (req, res) => {
