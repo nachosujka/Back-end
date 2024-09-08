@@ -14,10 +14,9 @@ router.use((req, res, next) => {
 
 router.get("/", (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
-  const producstWithLimit =
+  const productsWithLimit =
     products.length <= limit ? products : products.slice(0, limit);
-
-  res.json(producstWithLimit);
+  res.json(productsWithLimit);
 });
 
 router.get("/:pid", (req, res) => {
@@ -39,7 +38,7 @@ router.post("/", uploader.single("file"), (req, res) => {
   newProduct.status = true;
   newProduct.pid = uuidv4();
   products.push(newProduct);
-  res.status(201).json(products);
+  res.status(201).json(newProduct);
 });
 
 router.put("/:pid", (req, res) => {
