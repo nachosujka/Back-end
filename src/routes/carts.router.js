@@ -1,9 +1,29 @@
 import { error } from "console";
 import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
-const router = Router();
+import { fileURLToPath } from "url";
+import fs from "fs";
+import path from "path";
 
-let carritos = [];
+const router = Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const filePath = path.join(__dirname, "carts.json");
+
+const readFile = () => {
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+  const data = fs.readFileSync(filePath);
+  return JSON.parse(data);
+};
+
+const writeFile = (data) => {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
+
+let carritos = readFile();
 
 router.get("/", (req, res) => {
   res.json(carritos);
@@ -16,6 +36,7 @@ router.post("/", (req, res) => {
     products,
   };
   carritos.push(newCar);
+  writeFile(carritos);
   res.status(201).json(newCar);
 });
 
@@ -44,7 +65,7 @@ router.post("/:cid/products/:pid", (req, res) => {
     };
     car.products.push(newProduct);
   }
-
+  writeFile(carritos);
   const product = car.products.find((p) => p.pid === productId);
   res.status(201).json({
     pid: product.pid,
