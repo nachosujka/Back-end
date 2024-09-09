@@ -43,17 +43,9 @@ router.post("/", uploader.single("file"), (req, res) => {
 
 router.put("/:pid", (req, res) => {
   const productBuscado = req.params.pid;
-  const actualizarProduct = products.findIndex(
-    (el) => el.pid === productBuscado
-  );
-
-  if (actualizarProduct === -1) {
-    return res.status(404).json({ error: "Producto no encontrado" });
-  }
-  products[actualizarProduct] = {
-    ...products[actualizarProduct],
-  };
-  res.json(products[actualizarProduct]);
+  const actualizarProduct = req.body;
+  products[productBuscado] = actualizarProduct;
+  res.send({ status: "succes", message: "Producto actualizado" });
 });
 
 router.delete("/:pid", (req, res) => {
