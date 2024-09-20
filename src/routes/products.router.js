@@ -30,11 +30,11 @@ router.use((req, res, next) => {
   next();
 });
 
-router.get("/", (req, res) => {
+router.get("/list", (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const productsWithLimit =
     products.length <= limit ? products : products.slice(0, limit);
-  res.json(productsWithLimit);
+  res.render("home", { products: productsWithLimit });
 });
 
 router.get("/:pid", (req, res) => {
