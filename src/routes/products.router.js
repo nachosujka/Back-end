@@ -19,11 +19,11 @@ const readFile = () => {
   return JSON.parse(data);
 };
 
-const writeFile = (data) => {
+export const writeFile = (data) => {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 };
 
-let products = readFile();
+export let products = readFile();
 
 router.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${new Date()}`);
@@ -35,6 +35,12 @@ router.get("/list", (req, res) => {
   const productsWithLimit =
     products.length <= limit ? products : products.slice(0, limit);
   res.render("home", { products: productsWithLimit });
+});
+router.get("/", (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const productsWithLimit =
+    products.length <= limit ? products : products.slice(0, limit);
+  res.render("realTimeProducts", { products: productsWithLimit });
 });
 
 router.get("/:pid", (req, res) => {
@@ -79,4 +85,5 @@ router.delete("/:pid", (req, res) => {
   writeFile(products);
   res.status(204).json({ mensaje: "Producto eliminado" });
 });
+
 export default router;

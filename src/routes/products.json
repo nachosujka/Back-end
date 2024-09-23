@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Iphone",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "123",
+    "stock": "132",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727101721603-Captura de pantalla 2024-08-20 161541.png",
+    "status": true,
+    "pid": "8e709dec-487b-47e4-9f3a-77c1b50718a6"
+  }
+]
