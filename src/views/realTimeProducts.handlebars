@@ -1,6 +1,6 @@
- <div></div>
-<h1>Lista de Productos</h1>
-  <ul id="product-list" >
+<div>
+  <h1>Lista de Productos</h1>
+  <ul id="product-list">
     {{#each products}}
       <li>
         <h2>Nombre: {{this.name}}</h2> <br>
@@ -13,9 +13,48 @@
       </li>
       <hr>
     {{/each}}
-  </ul></div>
-<button id ="agregar" >Agregar un producto</button>
-<button id="eliminar" >Eliminar producto</button>
+  </ul>
+</div>
+
+<!-- Botones para agregar y eliminar productos -->
+<button id="agregar" data-bs-toggle="modal" data-bs-target="#dialogo1">Agregar un producto</button>
+<button id="eliminar">Eliminar producto</button>
+
+<!-- Modal para agregar un producto -->
+<div class="modal fade" id="dialogo1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form id="product-form" class="formulario" enctype="multipart/form-data">
+          <label for="name">Nombre:</label>
+          <input type="text" name="name" id="name" required />
+          
+          <label for="description">Descripción:</label>
+          <input type="text" name="description" id="description" required />
+          
+          <label for="code">Código:</label>
+          <input type="text" name="code" id="code" required />
+          
+          <label for="price">Precio:</label>
+          <input type="number" name="price" id="price" required />
+          
+          <label for="stock">Stock:</label>
+          <input type="number" name="stock" id="stock" required />
+          
+          <label for="category">Categoría:</label>
+          <input type="text" name="category" id="category" required />
+          
+         <label for="file">Imagen:</label>
+          <input type="file" name="file" id="file" /> 
+          
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 <script src="/static/js/index.js" type="module"></script>

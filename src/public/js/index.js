@@ -23,24 +23,57 @@ function renderProductList() {
     `;
   });
 }
+const form = document.getElementById("product-form");
+form.addEventListener("submit", (event) => {
+  event.preventDefault(); // Prevenir el comportamiento por defecto del formulario (recargar o redirigir)
 
-const agregar = document.getElementById("agregar");
-agregar.addEventListener("click", () => {
-  Swal.fire({
-    title: "Realizado",
-    text: "Has agregado un producto",
-    icon: "success",
-  });
+  // Capturar los datos del formulario
   const newProduct = {
-    name: "Nuevo Producto",
-    description: "Descripción del nuevo producto",
-    code: "COD123",
-    price: 100,
-    stock: 10,
-    category: "General",
+    name: document.getElementById("name").value,
+    description: document.getElementById("description").value,
+    code: document.getElementById("code").value,
+    price: document.getElementById("price").value,
+    stock: document.getElementById("stock").value,
+    category: document.getElementById("category").value,
   };
-  socket.emit("nuevoProducto", newProduct);
+
+  // Emitir los datos del producto al servidor a través de Socket.IO
+  socket.emit("newProduct", newProduct);
+
+  // Muestra una alerta de éxito o realiza otras acciones
+  Swal.fire({
+    title: "Producto agregado",
+    text: "El producto fue agregado correctamente.",
+    icon: "success",
+    confirmButtonText: "OK",
+  });
+
+  // Cerrar el modal (si estás usando Bootstrap)
+  const modal = bootstrap.Modal.getInstance(
+    document.getElementById("dialogo1")
+  );
+  modal.hide();
+
+  // Limpiar el formulario después de enviarlo
+  form.reset();
 });
+// const agregar = document.getElementById("agregar");
+// agregar.addEventListener("click", () => {
+//   Swal.fire({
+//     title: "Realizado",
+//     text: "Has agregado un producto",
+//     icon: "success",
+//   });
+//   const newProduct = {
+//     name: "Nuevo Producto",
+//     description: "Descripción del nuevo producto",
+//     code: "COD123",
+//     price: 100,
+//     stock: 10,
+//     category: "General",
+//   };
+//   socket.emit("nuevoProducto", newProduct);
+// });
 
 const eliminar = document.getElementById("eliminar");
 eliminar.addEventListener("click", () => {

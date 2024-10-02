@@ -9,5 +9,82 @@
     "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727101721603-Captura de pantalla 2024-08-20 161541.png",
     "status": true,
     "pid": "8e709dec-487b-47e4-9f3a-77c1b50718a6"
+  },
+  {
+    "name": "Iphone",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "123123",
+    "stock": "123123",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727828747056-Captura de pantalla 2024-08-20 161541.png",
+    "status": true,
+    "pid": "36dbb32a-fd29-4328-809a-656becf70d1a"
+  },
+  {
+    "name": "Iphone",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "123123",
+    "stock": "123123",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727828764348-Captura de pantalla 2024-08-20 161541.png",
+    "status": true,
+    "pid": "5bc48a43-3a7b-4ebe-ba56-9316afa98e7e"
+  },
+  {
+    "name": "noc",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "3122",
+    "stock": "1312",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727829324292-Captura de pantalla 2024-08-14 142038.png",
+    "status": true,
+    "pid": "6310f732-7af0-466e-ab86-1f6290c047c6"
+  },
+  {
+    "name": "noc",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "3122",
+    "stock": "1312",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727829353376-Captura de pantalla 2024-08-14 142038.png",
+    "status": true,
+    "pid": "5b0d62b0-4bfb-449b-9c14-2f66d5c1a422"
+  },
+  {
+    "name": "noc",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "3122",
+    "stock": "1312",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727829359061-Captura de pantalla 2024-08-14 142038.png",
+    "status": true,
+    "pid": "d43b1ccc-71f7-468f-82e8-6ceab4a53025"
+  },
+  {
+    "name": "pan",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "3122",
+    "stock": "1312",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727829396205-Captura de pantalla 2024-08-14 142038.png",
+    "status": true,
+    "pid": "648a6cd6-e53c-4e44-9ea2-4e2e9f58faa9"
+  },
+  {
+    "name": "pan",
+    "description": "apple",
+    "code": "B3M66",
+    "price": "3122",
+    "stock": "1312",
+    "category": "celular",
+    "thumbnail": "C:\\Users\\User\\OneDrive\\Documentos\\Coderhouse\\Back-end\\src\\public\\img\\1727829430063-Captura de pantalla 2024-08-14 142038.png",
+    "status": true,
+    "pid": "5a7375d3-a6d7-4a97-8ae4-e5e1f7fcf4c7"
   }
 ]

@@ -44,7 +44,7 @@ socketServer.on("connection", (socket) => {
   socket.emit("productsActualizados", products);
 
   // Escuchar el evento para agregar un nuevo producto
-  socket.on("nuevoProducto", (newProduct) => {
+  socket.on("newProduct", (newProduct) => {
     products.push(newProduct); // Agregar el nuevo producto al array
     writeFile(products); // Guardar los productos en el archivo
     socketServer.emit("productsActualizados", products); // Notificar a  los clientes
@@ -59,7 +59,7 @@ socketServer.on("connection", (socket) => {
       socketServer.emit("productsActualizados", products); // Notificar a todos los clientes
       socket.emit("productoEliminado", productName); // Emitir el evento de producto eliminado
     } else {
-      socket.emit("productoNoEncontrado", productName); // Notificar si no se encontró el producto
+      socket.emit("productoNoEncontrado", productName); // Notificar si no se encontro el producto
     }
   });
 });
