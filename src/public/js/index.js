@@ -48,7 +48,7 @@ form.addEventListener("submit", (event) => {
     confirmButtonText: "OK",
   });
 
-  // Cerrar el modal (si estás usando Bootstrap)
+  // Cerrar el modal
   const modal = bootstrap.Modal.getInstance(
     document.getElementById("dialogo1")
   );
