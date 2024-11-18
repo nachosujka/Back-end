@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import __dirname from "./utils.js";
+import __dirname from "./dirname.js";
 import handlebars from "express-handlebars";
 import cartsRouter from "./routes/carts.router.js";
 import productsRouter from "./routes/products.router.js";
@@ -9,12 +9,17 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import methodOverride from "method-override";
 import productModel from "./models/product.model.js";
-
+import sessionRouter from "./routes/session.router.js";
+import { initializePassport } from "./config/passport.config.js";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 const app = express();
 dotenv.config();
 
 const uriConexion = process.env.URIMONGO;
 mongoose.connect(uriConexion);
+
+initializePassport();
 
 app.engine("handlebars", handlebars.engine());
 app.set("views", __dirname + "/views");
@@ -29,9 +34,19 @@ app.use((req, res, next) => {
 });
 app.use("/carts", cartsRouter);
 app.use("/products", productsRouter);
+app.use("/session", sessionRouter);
 
 const publicPath = path.join(__dirname, "public");
+
 app.use("/static", express.static(publicPath));
+app.use(
+  session({
+    secret: "secret",
+    resave: true, // Mantiene la session activa, si esto est el false la session se cierra
+    saveUninitialized: true, // Guarde la session
+  })
+);
+app.use(cookieParser("secretKey"));
 
 app.get("/product", (req, res) => {
   res.render("product");
@@ -44,29 +59,3 @@ app.get("/newProduct", (req, res) => {
 const httpServer = app.listen(8080, () => {
   console.log("Servidor iniciado");
 });
-// const socketServer = new Server(httpServer);
-// socketServer.on("connection", (socket) => {
-//   console.log("Ingreso un nuevo cliente");
-
-//   socket.emit("productsActualizados", products);
-
-//   // Escuchar el evento para agregar un nuevo producto
-//   socket.on("newProduct", (newProduct) => {
-//     products.push(newProduct); // Agregar el nuevo producto al array
-//     writeFile(products); // Guardar los productos en el archivo
-//     socketServer.emit("productsActualizados", products); // Notificar a  los clientes
-//   });
-
-//   // Escuchar el evento para eliminar un producto
-//   socket.on("eliminarProducto", (productName) => {
-//     const productIndex = products.findIndex((p) => p.name === productName);
-//     if (productIndex !== -1) {
-//       products.splice(productIndex, 1); // Eliminar el producto del array
-//       writeFile(products); // Guardar los cambios en el archivo
-//       socketServer.emit("productsActualizados", products); // Notificar a todos los clientes
-//       socket.emit("productoEliminado", productName); // Emitir el evento de producto eliminado
-//     } else {
-//       socket.emit("productoNoEncontrado", productName); // Notificar si no se encontro el producto
-//     }
-//   });
-// });
