@@ -2,51 +2,46 @@ import express from "express";
 import ProductModel from "../models/product.model.js";
 import { uploader } from "../dirname.js";
 import methodOverride from "method-override";
+import { authorization } from "../middlewares/authorization.middleware.js";
+import { productDao } from "../dao/product.dao.js";
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", authorization("user"), async (req, res) => {
   try {
-    const products = await ProductModel.find();
-    let page = parseInt(req.query.page);
-    let limit = parseInt(req.query.limit);
+    const { limit, page, sort, category, status } = req.query;
 
-    if (!page) page = 1;
-    if (!limit) limit = 10;
-    let result = await ProductModel.paginate({}, { page, limit, lean: true });
-    result.prevLink = result.hasPrevPage
-      ? `http://localhost:8080/products?page=${result.prevPage}&limit=${limit}`
-      : "";
-    result.nextLink = result.hasNextPage
-      ? `http://localhost:8080/products?page=${result.nextPage}&limit=${limit}`
-      : "";
-    result.isValid = !(page <= 0 || page > result.totalPages);
+    const options = {
+      limit: limit || 10,
+      page: page || 1,
+      sort: {
+        price: sort === "asc" ? 1 : -1,
+      },
+      learn: true,
+    };
 
-    const yourCartId = "67155a750b8c086f2bdb8685";
-    res.render("products", {
-      products: result.docs,
-      cartId: yourCartId,
-      hasPrevPage: result.hasPrevPage,
-      hasNextPage: result.hasNextPage,
-      prevLink: result.prevPage
-        ? `/?page=${result.prevPage}&limit=${limit}`
-        : null,
-      nextLink: result.nextPage
-        ? `/?page=${result.nextPage}&limit=${limit}`
-        : null,
-      page: result.page,
-      isValid: result.isValid,
-    });
+    // Si nos solicitan por categoría
+    if (category) {
+      const products = await productDao.getAll({ category }, options);
+      return res.status(200).json({ status: "success", products });
+    }
+
+    if (status) {
+      const products = await productDao.getAll({ status }, options);
+      return res.status(200).json({ status: "success", products });
+    }
+
+    const products = await productDao.getAll({}, options);
+    res.status(200).json({ status: "success", products });
   } catch (error) {
-    return res.render("error", {
-      Error: "Error al obtener todos los productos",
-    });
+    console.log(error);
+    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:pid", authorization("user"), async (req, res) => {
   try {
-    const productId = req.params.id;
-    const product = await ProductModel.findById(productId); // Busca el producto por ID
+    const productId = req.params.pid;
+    const product = await productDao.getById(productId); // Busca el producto por ID
 
     if (!product) {
       return res.status(404).render("error", {
@@ -99,6 +94,24 @@ router.get("/productJson", async (req, res) => {
   res.json(result);
 });
 
+router.put("/:pid", async (req, res) => {
+  try {
+    const productId = req.params.pid;
+    const productData = req.body;
+    const product = await productDao.update(productId, productData);
+    if (!product)
+      return res
+        .status(404)
+        .json({ status: "Error", msg: "Producto no encontrado" });
+
+    res.status(200).json({ status: "success", product });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "Error", msg: "Error interno del servidor" });
+  }
+});
 router.post("/newProduct", uploader.single("file"), async (req, res) => {
   try {
     const newProductData = req.body; // Verifica datos enviados desde el formulario
@@ -107,7 +120,7 @@ router.post("/newProduct", uploader.single("file"), async (req, res) => {
       newProductData.thumbnail = `/img/${req.file.filename}`;
     }
 
-    const newProduct = new ProductModel(newProductData);
+    const newProduct = await productDao.create(newProductData);
 
     await newProduct.save();
     res.redirect("/products");
@@ -116,10 +129,11 @@ router.post("/newProduct", uploader.single("file"), async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:pid", async (req, res) => {
   try {
-    const result = await ProductModel.findByIdAndDelete(req.params.id);
-    if (!result) {
+    const productId = req.params.pid;
+    const product = await productDao.deleteOne(productId);
+    if (!product) {
       return res
         .status(404)
         .render("error", { error: "Error al eliminar el producto" });

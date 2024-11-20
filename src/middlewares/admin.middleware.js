@@ -1,6 +1,6 @@
 import { request, response } from "express";
 
-export const isAdmin = async (req = request, res = response, next) => {
+export const admin = async (req = request, res = response, next) => {
   try {
     const user = req.session.user;
     if (!user)
@@ -16,6 +16,8 @@ export const isAdmin = async (req = request, res = response, next) => {
     next();
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "Erro", msg: "Error interno del servidor" });
+    res
+      .status(500)
+      .json({ status: "Error", msg: "Error interno del servidor" });
   }
 };
