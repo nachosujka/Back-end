@@ -20,34 +20,12 @@ router.post("/register", passportCall("register"), async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", passportCall("login"), async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (email === "nacho@gmail.com" && password === "nacho123") {
-      // Aca verifico si mandaron esos datos, en el caso que los manden, es administrador
-      req.session.user = {
-        email,
-        first_name: "Admin",
-        role: "admin",
-      };
-      return res
-        .status(200)
-        .json({ status: "success", payload: req.session.user });
-    }
-    const user = await userDao.getByEmail(email);
-    if (!user || !isValidPassword(password, user.password))
-      //Verifico que el usuario exista y que la clave coincida con el user
-      return res
-        .status(401)
-        .json({ status: "error", msg: "Email o contraseña incorrecta" });
-    req.session.user = {
-      email,
-      first_name: user.first_name,
-      role: "user",
-    };
-    return res
-      .status(200)
-      .json({ status: "success", payload: req.session.user });
+    const token = createToken(req.user);
+
+    res.cookie("token", token, { httpOnly: true });
+    res.status(200).json({ status: "success", payload: req.user });
   } catch (error) {
     console.log(error);
     res

@@ -5,7 +5,8 @@ import googole from "passport-google-oauth20";
 import dotenv from "dotenv";
 import jwt from "passport-jwt";
 import { cookieExtractor } from "../utils/cookieExtractor.js";
-
+import { createToken } from "../utils/jwt.js";
+import { cartDao } from "../dao/cart.dao.js";
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = googole.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -21,6 +22,9 @@ export const initializePassport = () => {
           const user = await userDao.getByEmail(username); //Valido si el user existe
           if (user)
             return done(null, false, { message: "El usuario ya existe" });
+
+          const cart = await cartDao.create();
+
           const newUser = {
             first_name,
             last_name,
@@ -28,11 +32,31 @@ export const initializePassport = () => {
             email: username,
             password: createHash(password), //Encripto la clave
             role: role ? role : "user",
+            cart: cart._id,
           };
           const createUser = await userDao.create(newUser);
           return done(null, createUser);
         } catch (error) {
           return done(error);
+        }
+      }
+    )
+  );
+  passport.use(
+    "login",
+    new LocalStrategy(
+      { usernameField: "email" },
+      async (username, password, done) => {
+        try {
+          const user = await userDao.getByEmail(username);
+          if (!user || !isValidPassword(password, user.password)) {
+            return done(null, false, {
+              message: "Email o contraseña no valido",
+            });
+          }
+          done(null, user);
+        } catch (error) {
+          done(error);
         }
       }
     )
