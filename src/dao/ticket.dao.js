@@ -1,6 +1,5 @@
-import productModel from "../models/product.model.js";
-
-class ProductDao {
+import ticketModel from "../models/ticket.model.js";
+class TicketDao {
   async getAll(query, options) {
     const products = await productModel.paginate(query, options);
     return products;
@@ -33,4 +32,4 @@ class ProductDao {
   }
 }
 
-export const productDao = new ProductDao();
+export const ticketDao = new TicketDao();

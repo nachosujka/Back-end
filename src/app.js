@@ -2,17 +2,16 @@ import express from "express";
 import path from "path";
 import __dirname from "./dirname.js";
 import handlebars from "express-handlebars";
-import cartsRouter from "./routes/carts.router.js";
-import productsRouter from "./routes/products.router.js";
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import methodOverride from "method-override";
 import productModel from "./models/product.model.js";
-import sessionRouter from "./routes/session.router.js";
 import { initializePassport } from "./config/passport.config.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import indexRouter from "./routes/index.js";
+
 const app = express();
 dotenv.config();
 
@@ -32,10 +31,8 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${new Date()}`);
   next();
 });
-app.use("/carts", cartsRouter);
-app.use("/products", productsRouter);
-app.use("/session", sessionRouter);
 
+app.use("/api", indexRouter);
 const publicPath = path.join(__dirname, "public");
 
 app.use("/static", express.static(publicPath));

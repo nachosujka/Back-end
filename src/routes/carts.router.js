@@ -9,117 +9,40 @@ import productModel from "../models/product.model.js";
 import { cartDao } from "../dao/cart.dao.js";
 import { productDao } from "../dao/product.dao.js";
 import { authorization } from "../middlewares/authorization.middleware.js";
-const router = Router();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { passportCall } from "../middlewares/passport.middlewares.js";
+import { CartControler } from "../controlers/cart.controler.js";
 
-const filePath = path.join(__dirname, "carts.json");
+const cartControler = new CartControler();
+const router = Router();
 
 router.use(passportCall("jwt"));
 
-router.post("/", authorization("admin"), async (req, res) => {
-  try {
-    // Busca el carrito
-    const cart = await cartDao.create();
-    res.status(201).json({ status: "success" }, cart);
-  } catch (error) {
-    return res
-      .status(500)
-      .render("error", { Error: "Error al agregar el producto al carrito" });
-  }
-});
+router.post("/", authorization("admin"), cartControler.createCart);
 
-router.get("/:cid", authorization("user"), async (req, res) => {
-  try {
-    const { cid } = req.params;
-    const cart = await cartDao.getById(cid);
-    console.log(cart);
-    if (!cart)
-      return res
-        .status(404)
-        .json({ status: "Error", msg: "Carrito no encontrado" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ status: "Error", msg: "Error al buscar un carrito" });
-  }
-});
+router.get("/:cid", authorization("user"), cartControler.getCartById);
 
+router.post(
+  "/:cid/purchase",
+  authorization("user"),
+  cartControler.purchaseCart
+);
+router.post(
+  "/:cid/product/:pid",
+  authorization("user"),
+  cartControler.addProductToCart
+);
 router.delete(
   "/:cid/products/:pid",
   authorization("user"),
-  async (req, res) => {
-    try {
-      const { cid, pid } = req.params;
-      // Encuentra el carrito por su ID
-      const product = await productDao.getById(pid);
-      if (!product)
-        return res.status(404).json({ message: "Carrito no encontrado" });
-
-      // Filtra los productos para eliminar el producto especifico
-      const cart = await cartDao.getById(cid);
-      if (!cart)
-        return res.status(404).json({ message: "Carrito no encontrado" });
-      await cart.save();
-
-      res.status(200).json({ status: "success", payload: cartUpdate });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error al eliminar el producto del carrito" });
-    }
-  }
+  cartControler.deleteProductToCart
 );
 
-router.put("/:cid/products/:pid", authorization("user"), async (req, res) => {
-  try {
-    const { cid, pid } = req.params;
-    const { quantity } = req.body;
+router.put(
+  "/:cid/products/:pid",
+  authorization("user"),
+  cartControler.updateQuantityProductInCart
+);
 
-    const product = await productDao.getById(pid);
-    if (!product)
-      return res.status(404).json({
-        status: "Error",
-        msg: `No se encontró el producto con el id ${pid}`,
-      });
-    const cart = await cartDao.getById(cid);
-    if (!cart)
-      return res.status(404).json({
-        status: "Error",
-        msg: `No se encontró el carrito con el id ${cid}`,
-      });
-
-    const cartUpdate = await cartDao.updateQuantityProductInCart(
-      cid,
-      pid,
-      Number(quantity)
-    );
-
-    res.status(200).json({ status: "success", payload: cartUpdate });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: "Error", msg: "Error al cambiar el carrito o producto" });
-  }
-});
-
-router.delete("/:cid", authorization("admin"), async (req, res) => {
-  try {
-    const { cid } = req.params;
-    const cart = await cartDao.clearProductsToCart(cid);
-    if (!cart)
-      return res
-        .status(404)
-        .json({ status: "Error", msg: "Carrito no encontrado" });
-
-    res.status(200).json({ status: "success", cart });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: "Error", msg: "Error al eliminar el carrito" });
-  }
-});
+router.delete("/:cid", authorization("admin"), cartControler.clearCart);
 
 export default router;

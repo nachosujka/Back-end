@@ -1,5 +1,4 @@
 import passport from "passport";
-import { Strategy } from "passport-local";
 
 export const passportCall = (strategy) => {
   return async (req, res, next) => {
