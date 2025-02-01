@@ -5,7 +5,7 @@ import passport from "passport";
 import { createToken, verifyToken } from "../utils/jwt.js";
 import { passportCall } from "../middlewares/passport.middlewares.js";
 import { authorization } from "../middlewares/authorization.middleware.js";
-import { SessionControler } from "../controlers/session.controler.js";
+import { SessionControler } from "../controllers/session.controller.js";
 
 const sessionControler = new SessionControler();
 const router = Router();

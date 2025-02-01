@@ -5,13 +5,13 @@ class ProductService {
     return await productDao.getAll(query, options);
   }
   async getById(id) {
-    const product = await productDao.getById();
+    const product = await productDao.getById(id);
     if (!product) return null;
     const productFormat = new ProductResponseDto(product);
     return product;
   }
   async deleteOne(id) {
-    const product = await productDao.getById();
+    const product = await productDao.getById(id);
     if (!product) return null;
     await productDao.deleteOne(id);
     return true;

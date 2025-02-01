@@ -5,7 +5,7 @@ import { uploader } from "../dirname.js";
 import methodOverride from "method-override";
 import { authorization } from "../middlewares/authorization.middleware.js";
 import { productDao } from "../dao/product.dao.js";
-import { ProductControler } from "../controlers/product.controler.js";
+import { ProductControler } from "../controllers/product.controller.js";
 import { passportCall } from "../middlewares/passport.middlewares.js";
 import { checkProductData } from "../middlewares/checkProductData.middleware.js";
 

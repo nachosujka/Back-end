@@ -1,4 +1,5 @@
 import { UserResponseDto } from "../dto/user.dto.js";
+import { userDao } from "../dao/user.dao.js";
 import { createToken } from "../utils/jwt.js";
 export class SessionControler {
   async register(req, res) {

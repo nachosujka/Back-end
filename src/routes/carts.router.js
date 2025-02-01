@@ -10,7 +10,7 @@ import { cartDao } from "../dao/cart.dao.js";
 import { productDao } from "../dao/product.dao.js";
 import { authorization } from "../middlewares/authorization.middleware.js";
 import { passportCall } from "../middlewares/passport.middlewares.js";
-import { CartControler } from "../controlers/cart.controler.js";
+import { CartControler } from "../controllers/cart.controller.js";
 
 const cartControler = new CartControler();
 const router = Router();
