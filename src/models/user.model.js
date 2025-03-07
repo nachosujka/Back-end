@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import cartModel from "./cart.model";
+import cartModel from "./cart.model.js";
 
-const { Schema } = mongoose;
+const { Schema, model } = mongoose;
 
 const userCollection = "users";
 
@@ -17,19 +17,19 @@ const userSchema = new Schema({
   },
   cart: { type: mongoose.Schema.Types.ObjectId, ref: "cart" },
 });
+
 userSchema.post("save", async function (userCreated) {
   try {
     if (!userCreated.cart) {
-      //En session controller creo carrito cuando se crea un usuario, si no se creo el carrito lo creo aca
       const newCart = await cartModel.create({ products: [] });
       userCreated.cart = newCart._id;
-      const mensaje = await userCreated.save();
-      console.log(mensaje);
+      await userCreated.save();
     }
   } catch (error) {
     console.log(error);
   }
 });
-const userModel = mongoose.model(userCollection, userSchema);
+
+const userModel = model(userCollection, userSchema);
 
 export default userModel;

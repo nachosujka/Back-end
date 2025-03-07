@@ -1,18 +1,18 @@
-import { cartDao } from "../dao/cart.dao.js";
-import { productDao } from "../dao/product.dao.js";
 import { productService } from "../services/product.services.js";
 import { cartService } from "../services/cart.services.js";
 import { ticketService } from "../services/ticket.services.js";
+
 export class CartControler {
   async createCart(req, res) {
     try {
-      // Busca el carrito
+      // Crea el carrito
       const cart = await cartService.create();
       res.status(201).json({ status: "success" }, cart);
     } catch (error) {
-      return res
-        .status(500)
-        .render("error", { Error: "Error al agregar el producto al carrito" });
+      return res.status(500).json({
+        status: "Error",
+        msg: "Error al agregar el producto al carrito",
+      });
     }
   }
 

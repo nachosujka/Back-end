@@ -3,16 +3,23 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "node src/app.js",
     "dev": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "testMocha": "mocha test/Users/Users.test.js",
+    "testUser": "mocha test/Users/UsersSupertest.test.js",
+    "testCart": "mocha test/Carts/CartsSupertest.test.js",
+    "testProduct":"mocha test/Products/ProductsSupertest.test.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@faker-js/faker": "^9.4.0",
+    "assert": "^2.1.0",
     "bcrypt": "^5.1.1",
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
@@ -35,9 +42,16 @@
     "read-package-json": "^7.0.1",
     "rimraf": "^6.0.1",
     "socket.io": "^4.7.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "sweetalert2": "^11.14.1",
     "uuid": "^10.0.0",
     "winston": "^3.17.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.1.0",
+    "supertest": "^7.0.0"
+  }
 }

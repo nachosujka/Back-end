@@ -2,15 +2,24 @@ import passport from "passport";
 import local from "passport-local";
 import { userDao } from "../dao/user.dao.js";
 import googole from "passport-google-oauth20";
-import dotenv from "dotenv";
+import "dotenv/config";
 import jwt from "passport-jwt";
-import { cookieExtractor } from "../utils/cookieExtractor.js";
-import { createToken } from "../utils/jwt.js";
-import { cartDao } from "../dao/cart.dao.js";
+import { createHash } from "../utils/hashPassword.js";
+
 const LocalStrategy = local.Strategy;
 const GoogleStrategy = googole.Strategy;
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
+
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies["coderCookie"];
+    console.log("Token extraído de la cookie:", token);
+  }
+  return token;
+};
+
 export const initializePassport = () => {
   passport.use(
     "register",
@@ -18,30 +27,31 @@ export const initializePassport = () => {
       { passReqToCallback: true, usernameField: "email" },
       async (req, username, password, done) => {
         try {
-          const { first_name, last_name, age } = req.body;
-          const user = await userDao.getByEmail(username); //Valido si el user existe
-          if (user)
-            return done(null, false, { message: "El usuario ya existe" });
+          const { first_name, last_name, email, password, age } = req.body;
 
-          const cart = await cartDao.create();
+          const findUser = await userDao.getByEmail(email);
 
-          const newUser = {
-            first_name,
-            last_name,
-            age,
-            email: username,
-            password: createHash(password), //Encripto la clave
-            role: role ? role : "user",
-            cart: cart._id,
-          };
-          const createUser = await userDao.create(newUser);
-          return done(null, createUser);
-        } catch (error) {
-          return done(error);
+          //Si usuario existe
+          if (!findUser) {
+            const user = await userDao.create({
+              first_name: first_name,
+              last_name: last_name,
+              email: email,
+              password: createHash(password),
+              age: age,
+            });
+            return done(null, user); //Doy aviso de que genere un nuevo usuario
+          } else {
+            return done(null, false); //No devuelvo error pero no genero un nuevo usuario
+          }
+        } catch (e) {
+          console.log(e);
+          return done(e);
         }
       }
     )
   );
+
   passport.use(
     "login",
     new LocalStrategy(
@@ -61,6 +71,24 @@ export const initializePassport = () => {
       }
     )
   );
+  passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+        secretOrKey: process.env.PASSWORD_JWT,
+      },
+      async (jwt_payload, done) => {
+        try {
+          console.log(jwt_payload);
+          return done(null, jwt_payload.user);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+
   passport.serializeUser((user, done) => {
     done(null, user._id);
   });
@@ -97,22 +125,6 @@ export const initializePassport = () => {
           return cb(null, newUser);
         } catch (error) {
           return cb(error);
-        }
-      }
-    )
-  );
-  passport.use(
-    "jwt",
-    new JWTStrategy(
-      {
-        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: "Clave",
-      },
-      async (jwt_payload, done) => {
-        try {
-          return done(null, jwt_payload);
-        } catch (error) {
-          return done(error);
         }
       }
     )

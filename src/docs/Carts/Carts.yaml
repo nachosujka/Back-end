@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  title: API de Carrito
+  description: API para la gestión de carritos de compra
+  version: 1.0.0
+
+paths:
+  /api/carts:
+    get:
+      summary: Obtener todos los carritos
+      tags:
+        - Cart
+      responses:
+        "200":
+          description: Carritos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+
+  /api/carts/{id}:
+    get:
+      summary: Obtener carrito por ID
+      tags:
+        - Cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del carrito a buscar
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Carrito encontrado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "404":
+          description: Carrito no encontrado
+
+    put:
+      summary: Actualizar un carrito por ID
+      tags:
+        - Cart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del carrito a actualizar
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/CartProduct"
+      responses:
+        "200":
+          description: Carrito actualizado correctamente
+        "404":
+          description: Carrito no encontrado
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID autogenerado del carrito
+          example: "605c72f9a5f3a528b4a31d2c"
+        products:
+          type: array
+          description: Lista de productos en el carrito
+          items:
+            $ref: "#/components/schemas/CartProduct"
+
+    CartProduct:
+      type: object
+      properties:
+        product:
+          type: string
+          description: ID del producto en el carrito
+          example: "605c72f9a5f3a528b4a31d2c"
+        quantity:
+          type: integer
+          description: Cantidad del producto
+          example: 2

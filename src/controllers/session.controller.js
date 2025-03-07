@@ -1,16 +1,16 @@
-import { UserResponseDto } from "../dto/user.dto.js";
 import { userDao } from "../dao/user.dao.js";
 import { createToken } from "../utils/jwt.js";
 export class SessionControler {
   async register(req, res) {
-    //Obtengo los datos del body y creo un usuario
     try {
-      res.status(201).json({ status: "success", msg: "Usuario registrado" });
-    } catch (error) {
-      console.log(error);
-      res
-        .status(500)
-        .json({ status: "Error", msg: "Error interno del servidor" });
+      if (!req.user) {
+        //Consulto si en la sesion se encuentra mi usuario
+        return res.status(400).send("El mail ya se encuentra registrado");
+      }
+      res.status(201).send("Usuario creado correctamente");
+    } catch (e) {
+      console.log(e);
+      res.status(500).send("Error al registrar usuario");
     }
   }
 
@@ -18,9 +18,15 @@ export class SessionControler {
     //En caso de tener una cuenta ya creada inicio sesion
     try {
       const token = createToken(req.user);
-      res.cookie("token", token, { httpOnly: true });
+      req.session.user = {
+        email: req.user.email,
+        first_name: req.user.first_name,
+      };
 
-      res.status(200).json({ status: "success", payload: req.user });
+      res
+        .status(200)
+        .cookie("coderCookie", token, { httpOnly: true })
+        .json({ status: "success", payload: req.user });
     } catch (error) {
       console.log(error);
       res
@@ -41,18 +47,18 @@ export class SessionControler {
     }
   }
 
-  async current(req, res) {
-    //Obtengo los datos de la sesion
-    try {
-      const user = await userDao.getById(req.user.id);
-      res.status(200).json({ status: "success", payload: req.user });
-    } catch (error) {
-      console.log(error);
-      res
-        .status(500)
-        .json({ status: "Error", msg: "Error interno en el servidor" });
-    }
-  }
+  // async current(req, res) {
+  //   //Obtengo los datos de la sesion
+  //   try {
+  //     const user = await userDao.getById(req.user.id);
+  //     res.status(200).json({ status: "success", payload: req.user });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res
+  //       .status(500)
+  //       .json({ status: "Error", msg: "Error interno en el servidor" });
+  //   }
+  // }
 
   async googleAuth(req, res) {
     //Inicio sesion usando google

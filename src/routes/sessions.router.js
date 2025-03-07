@@ -1,27 +1,30 @@
 import { Router } from "express";
-import { userDao } from "../dao/user.dao.js";
-import { createHash, isValidPassword } from "../utils/hashPassword.js";
 import passport from "passport";
-import { createToken, verifyToken } from "../utils/jwt.js";
-import { passportCall } from "../middlewares/passport.middlewares.js";
 import { authorization } from "../middlewares/authorization.middleware.js";
 import { SessionControler } from "../controllers/session.controller.js";
 
 const sessionControler = new SessionControler();
 const router = Router();
 
-router.post("/register", passportCall("register"), sessionControler.register);
+router.post(
+  "/register",
+  passport.authenticate("register"),
+  sessionControler.register
+);
 
-router.post("/login", passportCall("login"), sessionControler.login);
+router.post("/login", passport.authenticate("login"), sessionControler.login);
 
 router.get("/logout", sessionControler.logout);
 
-router.get(
-  "/current",
-  passportCall("jwt"),
-  authorization("user"),
-  sessionControler.current
-);
+router.get("/current", passport.authenticate("jwt"), (req, res) => {
+  res.status(200).send(req.user);
+
+  if (!req.user) {
+    return res.status(401).send({ error: "Unauthorized - req.user vacío" });
+  }
+
+  res.status(200).send(req.user);
+});
 
 router.get(
   "/google",

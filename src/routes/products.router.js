@@ -6,9 +6,8 @@ import methodOverride from "method-override";
 import { authorization } from "../middlewares/authorization.middleware.js";
 import { productDao } from "../dao/product.dao.js";
 import { ProductControler } from "../controllers/product.controller.js";
-import { passportCall } from "../middlewares/passport.middlewares.js";
 import { checkProductData } from "../middlewares/checkProductData.middleware.js";
-
+import passport from "passport";
 const productControler = new ProductControler();
 const router = Router();
 
@@ -18,21 +17,21 @@ router.get("/:pid", productControler.getById);
 
 router.put(
   "/:pid",
-  passportCall("jwt"),
+  passport.authenticate("jwt"),
   authorization("admin"),
   productControler.update
 );
 router.post(
   "/",
   checkProductData,
-  passportCall("jwt"),
+  passport.authenticate("jwt"),
   authorization("admin"),
   productControler.create
 );
 
 router.delete(
   "/:pid",
-  passportCall("jwt"),
+  passport.authenticate("jwt"),
   authorization("admin"),
   productControler.deleteOne
 );
