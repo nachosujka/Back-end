@@ -5,18 +5,34 @@ import passport from "passport";
 const cartControler = new CartControler();
 const router = Router();
 
-// router.use(passport.authenticate("jwt"));
+router.use(passport.authenticate("jwt"));
 
-router.post("/", cartControler.createCart);
+router.post("/", authorization("admin"), cartControler.createCart);
 
-router.get("/:cid", cartControler.getCartById);
+router.get("/:cid", authorization("user"), cartControler.getCartById);
 
-router.post("/:cid/purchase", cartControler.purchaseCart);
-router.post("/:cid/product/:pid", cartControler.addProductToCart);
-router.delete("/:cid/products/:pid", cartControler.deleteProductToCart);
+router.post(
+  "/:cid/purchase",
+  authorization("user"),
+  cartControler.purchaseCart
+);
+router.post(
+  "/:cid/product/:pid",
+  authorization("user"),
+  cartControler.addProductToCart
+);
+router.delete(
+  "/:cid/products/:pid",
+  authorization("user"),
+  cartControler.deleteProductToCart
+);
 
-router.put("/:cid/products/:pid", cartControler.updateQuantityProductInCart);
+router.put(
+  "/:cid/products/:pid",
+  authorization("user"),
+  cartControler.updateQuantityProductInCart
+);
 
-router.delete("/:cid", cartControler.clearCart);
+router.delete("/:cid", authorization("admin"), cartControler.clearCart);
 
 export default router;
