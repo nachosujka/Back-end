@@ -1,90 +1,82 @@
 import { expect } from "chai";
-import mongoose from "mongoose";
 import supertest from "supertest";
+import mongoose from "mongoose";
+import crypto from "crypto";
 import "dotenv/config";
 
 const requester = supertest("http://localhost:8080");
 
-describe("Productos API", function () {
-  let cookie;
-  let pid = "";
+describe("Rutas de Productos (CRUD)", function () {
+  let createdProductId;
 
   before(async () => {
-    await mongoose.connect(process.env.URIMONGO);
-
-    const user = {
-      email: "nacho@nacho.com",
-      password: "coder",
-    };
-
-    const loginRes = await requester.post("/api/sessions/login").send(user);
-    const cookieResult = loginRes.headers["set-cookie"][0];
-
-    cookie = {
-      name: cookieResult.split("=")[0],
-      value: cookieResult.split("=")[1].split(";")[0],
-    };
+    try {
+      await mongoose.connect(process.env.URIMONGO);
+      console.log("Conexión exitosa a MongoDB");
+      await mongoose.connection.db.collection("products").deleteMany({});
+    } catch (error) {
+      console.error("Error al conectar a MongoDB:", error);
+    }
   });
 
-  it("Debería crear un producto", async () => {
-    const newProduct = {
-      title: "Producto de prueba",
-      description: "Descripción del producto",
-      price: 100,
+  it("POST /api/products - Debería crear un producto", async () => {
+    const testProduct = {
+      nombre: "Producto de prueba",
+      precio: 99.99,
+      descripcion: "Descripcion de prueba",
+      codigo: `TEST-${crypto.randomBytes(4).toString("hex")}`,
       stock: 10,
+      categoria: "prueba",
     };
 
-    const res = await requester
-      .post("/api/products")
-      .set("Cookie", `${cookie.name}=${cookie.value}`)
-      .send(newProduct);
+    const response = await requester.post("/api/products").send(testProduct);
 
-    expect(res.status).to.equal(201);
-    expect(res.body).to.have.property("_id");
-    pid = res.body._id;
+    expect(response.statusCode).to.equal(200);
+    expect(response.body.product).to.be.an("object");
+    expect(response.body.product.nombre).to.equal(testProduct.nombre);
+    createdProductId = response.body.product._id;
   });
 
-  it("Debería obtener todos los productos", async () => {
-    const res = await requester
-      .get("/api/products")
-      .set("Cookie", `${cookie.name}=${cookie.value}`);
+  it("GET /api/products - Deberia listar productos con paginacion", async () => {
+    const response = await requester.get("/api/products?limit=5&page=1");
 
-    expect(res.status).to.equal(200);
-    expect(res.body).to.be.an("array");
+    expect(response.statusCode).to.equal(200);
+    expect(response.body.products.docs).to.be.an("array");
+    expect(response.body.products.docs.length).to.be.greaterThan(0);
   });
 
-  it("Debería obtener un producto por ID", async () => {
-    const res = await requester
-      .get(`/api/products/${pid}`)
-      .set("Cookie", `${cookie.name}=${cookie.value}`);
+  it("GET /api/products/:pid - Deberia obtener un producto por ID", async () => {
+    const response = await requester.get(`/api/products/${createdProductId}`);
 
-    expect(res.status).to.equal(200);
-    expect(res.body).to.have.property("_id", pid);
+    expect(response.statusCode).to.equal(200);
+    expect(response.body.product).to.be.an("object");
+    expect(response.body.product._id).to.equal(createdProductId);
   });
 
-  it("Debería actualizar un producto", async () => {
-    const updatedProduct = {
-      title: "Producto actualizado",
-      price: 150,
-    };
+  it("PUT /api/products/:pid - Deberia actualizar un producto", async () => {
+    const updatedData = { precio: 199.99 };
 
-    const res = await requester
-      .put(`/api/products/${pid}`)
-      .set("Cookie", `${cookie.name}=${cookie.value}`)
-      .send(updatedProduct);
+    const response = await requester
+      .put(`/api/products/${createdProductId}`)
+      .send(updatedData);
 
-    expect(res.status).to.equal(200);
-    expect(res.body).to.have.property("title", "Producto actualizado");
+    expect(response.statusCode).to.equal(200);
+    expect(response.body.product.precio).to.equal(updatedData.precio);
   });
 
-  it("Debería eliminar un producto", async () => {
-    const res = await requester
-      .delete(`/api/products/${pid}`)
-      .set("Cookie", `${cookie.name}=${cookie.value}`);
+  it("DELETE /api/products/:pid - Deberia eliminar un producto", async () => {
+    const response = await requester.delete(
+      `/api/products/${createdProductId}`
+    );
 
-    expect(res.status).to.equal(200);
+    expect(response.statusCode).to.equal(200);
+    expect(response.body.product._id).to.equal(createdProductId);
+
+    const checkResponse = await requester.get(
+      `/api/products/${createdProductId}`
+    );
+    expect(checkResponse.statusCode).to.equal(404);
   });
-
   after(async () => {
     await mongoose.connection.close();
   });
